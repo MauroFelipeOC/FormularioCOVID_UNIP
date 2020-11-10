@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-//typedef int bool;
 typedef long long int TIPOCHAVE;
 
 typedef struct 
