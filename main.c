@@ -29,7 +29,7 @@ REGISTRO cadastro()
         if(reg.nome[i+1] == '\0') reg.nome[i] = NULL;
     }    
 
-    printf("\nInsira cpf: ");
+    printf("\nInsira CPF: ");
     fflush(stdin);
     scanf("%lld", &reg.cpf);
         
@@ -303,5 +303,6 @@ int menuPrincipal(void)
 
 int main(void)
 {
-    menuPrincipal();    
+    menuPrincipal();
+	system("pause");    
 }
