@@ -5,13 +5,14 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <time.h>
-#include "dados.h"
+#include "dados.h"  //Biblioteca que implementa a estrutura de dados lista ligada dinâmica
 
 #define NUM_TENTATITVAS_LOGIN 3
 
 REGISTRO cadastro()
+/// Esta funcao recebe os dados do paciente a partir da entrada padrao e retorna esses dados em uma estrutura REGISTRO, definida em dados.h
 {
-    REGISTRO reg;
+    REGISTRO reg;   // struct em que os dados serao armazenados
     
     int i;
     
@@ -19,13 +20,13 @@ REGISTRO cadastro()
     fflush(stdin);
     fgets(reg.nome, 255, stdin);
 
-    for (i = 0; reg.nome[i] != '\0'; i++)
+    for (i = 0; reg.nome[i] != '\0'; i++)//Este laco percorre a string reg.nome e converte as letras minusculas em maiusculas
     {
         if (reg.nome[i] >= 'a' && reg.nome[i] <= 'z')
         {
             reg.nome[i] = reg.nome[i] - 32;
         }
-        if(reg.nome[i] == '\n') reg.nome[i] = '\0';
+        if(reg.nome[i] == '\n') reg.nome[i] = '\0'; //Troca o caractere de formatacao de nova linha "\n" pelo caractere de fim de string "\0"
         if(reg.nome[i+1] == '\0') reg.nome[i] = NULL;
     }    
 
@@ -87,7 +88,6 @@ REGISTRO cadastro()
 
     if (toupper(reg.comorbidade) == 'S')
     {
-
         printf("\nDigite as comorbidades: ");
         fflush(stdin);
         scanf("%s", &reg.doencas);
@@ -96,10 +96,10 @@ REGISTRO cadastro()
     struct tm *data;
     time_t segundos;
         
-    time(&segundos);
-    data = localtime(&segundos);
+    time(&segundos);    //Esta funcao da biblioteca time.h retorna a hora do sistema em segundos
+    data = localtime(&segundos);    // Converte de segundos para data atual
 
-    if(((data->tm_mon+1) <= reg.mesN) && (data->tm_mday < reg.diaN)){
+    if(((data->tm_mon+1) <= reg.mesN) && (data->tm_mday < reg.diaN)){   //Calculo da idade
         reg.idade = (data->tm_year + 1900) - reg.anoN -1;        
     }else{
             reg.idade = (data->tm_year + 1900) - reg.anoN;            
@@ -107,9 +107,9 @@ REGISTRO cadastro()
     
     printf("\nIdade: %d\n", reg.idade);
 
-    if (reg.idade >= 65 || toupper(reg.comorbidade) == 'S')
+    if (reg.idade >= 65 || toupper(reg.comorbidade) == 'S') // Avaliacao quanto a inclusao no grupo de risco
     {
-        registrarGrupoRisco(reg);
+        registrarGrupoRisco(reg);   // Se estiver no grupo de risco, registra no arquivo de texto
         printf("Grupo de RISCO!!!\n");
         system("pause");
     }
@@ -122,7 +122,7 @@ REGISTRO cadastro()
     return reg;
 }
 
-void registrarGrupoRisco(REGISTRO reg)
+void registrarGrupoRisco(REGISTRO reg)// Esta funcao recebe uma struct REGISTRO, e insere os dados no arquivo de paciente em grupo de risco
 {
     FILE *Ponteiro;
     Ponteiro = fopen("grupo_de_risco.txt", "a");
@@ -131,16 +131,21 @@ void registrarGrupoRisco(REGISTRO reg)
 }
 
 bool autenticar(char *loginCad, char *senhaCad, int tentativas)
+// Esta funcao realiza a autenticacao de usuarios
+//*loginCad: string com o login ja cadastrado
+//*senhaCad: string com a senha ja cadastrada
+// tentativas: numero maximo de tentativas que podem ser realizadas antes que o programa feche automaticamente
 {
     setlocale(LC_ALL, "Portuguese");
 
     char login[15];
     char senha[7];
-    char c;
-    int cont = 0;
-    int i;
-    int a;
+    int cont = 0;   //Armazena a quantidade de tentativas ja realizadas
     int verifica_senha = 0;
+    /*Demais variaveis auxiliares de iteracao*/
+    char c;
+    int i;
+    int a;    
 
     do
     {
@@ -188,7 +193,9 @@ bool autenticar(char *loginCad, char *senhaCad, int tentativas)
     }
 }
 
-bool arquivarGeral(REGISTRO reg){
+void arquivarGeral(REGISTRO reg)
+// Esta funcao armazena os dados do paciente em "arquivo_pacientes.txt"
+{
     FILE *Ponteiro;
     Ponteiro = fopen("arquivo_pacientes.txt", "a");
     fprintf(Ponteiro, "{\"nome\": \"%s\", \"cpf\": \"%011lld\", \"telefone\": \"%d\", \"endereco\": \"%s\", \"numero\": \"%d\", \"bairro\": \"%s\", \"cidade\": \"%s\", \"estado\": \"%s\", \"cep\": \"%d\", \"diaN\": \"%d\", \"mesN\": \"%d\", \"anoN\": \"%d\", \"email\":\"%s\", \"diagnostico\": \"%s\", \"comorbidade\": \"%c\", \"idade\": \"%d\", \"doencas\": \"%s\"},\n",  
@@ -214,6 +221,7 @@ bool arquivarGeral(REGISTRO reg){
 
 
 cadastrarUser(char *login, char *senha)
+//Esta funcao realiza o cadastro de usuarios e armazena nos ponteiros char *login e char *senha
 {
     int c = 0;
     int i = 0;
@@ -236,20 +244,21 @@ cadastrarUser(char *login, char *senha)
 }
 
 int menuPrincipal(void)
+// Esta funcao exibe o menu principal
 {
     int opcao = 1;
     char loginCad[15];
     char senhaCad[7];
     loginCad[0] = 0;
 
-    LISTA pacientes;
+    LISTA pacientes;    //instancia a estrutura de dados que armazena os registros dos pacientes
     inicializarLista(&pacientes);
 
-    if (!loginCad[0])
-    { //Se ainda não houver login cadastrado
+    if (!loginCad[0]) //Se ainda não houver login cadastrado
+    { 
         printf("Cadastro de primeiro login\n");
         cadastrarUser(loginCad, senhaCad);
-        system("cls"); //Limpa a tela
+        system("cls");
     }
 
     do
